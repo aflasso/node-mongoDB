@@ -2,9 +2,9 @@ const { response, request, json } = require("express");
 
 const bcrypt = require('bcrypt')
 
-const {client} = require('../config/db')
+const mongoose = require('mongoose')
 
-const db = client.db('sample_mflix').collection('users')
+const User = require('../models/users')
 
 const getAllUsers = async (req = request, res = response) => {
 
@@ -12,7 +12,7 @@ const getAllUsers = async (req = request, res = response) => {
 
     try {
 
-        const users = await db.find().toArray()
+        const users =  await User.find()
         console.log(users);
         return res.status(200).json({status: 'ok', data: users})
 

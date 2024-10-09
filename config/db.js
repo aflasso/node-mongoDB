@@ -1,23 +1,14 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = process.env.MONGODB_URL;
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-async function run() {
+// db.js
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-
-  } catch (error) {
-    console.error('Error conectando a MongoDB', error);
-    process.exit(1)
+    await mongoose.connect(process.env.MONGODB_URL);
+    console.log('Conectado a MongoDB Atlas');
+  } catch (err) {
+    console.error('Error al conectar a MongoDB Atlas:', err);
+    process.exit(1); // Salir con error si no se conecta
   }
-}
+};
 
-module.exports = {run, client}
+module.exports = connectDB;
