@@ -1,5 +1,6 @@
 const express = require('express');
 const Contratacion = require('../models/contrataciones');  // Asegúrate de que la ruta sea correcta
+const Equipo = require('../models/equipo')
 
 const postContrat = async (req, res) => {
     try {
@@ -14,9 +15,30 @@ const postContrat = async (req, res) => {
 const getContrat = async (req, res) => {
     try {
         const contrataciones = await Contratacion.find().populate('idJugador idEquipo');
+
         res.json(contrataciones);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+}
+
+const getContratByName = async (req, res) => {
+    try {
+        // Primero encontramos el equipo con el nombre especificado
+        const equipo = await Equipo.findOne({ nombre_equipo: req.params.nombreEquipo });
+        if (!equipo) {
+            return res.json({message: 'No existen contrataciones'}); // Si no se encuentra el equipo, devolvemos un array vacío
+        }
+
+        // Buscamos las contrataciones que coinciden con el idEquipo del equipo encontrado
+        const contrataciones = await Contratacion.find({ idEquipo: equipo._id })
+            .populate('idEquipo')  // Poblar el equipo
+            .populate('idJugador')  // Poblar el jugador
+            .exec();  // Ejecutamos la consulta
+
+        return res.json(contrataciones);
+    } catch (error) {
+        console.error(error);
     }
 }
 
@@ -50,4 +72,4 @@ const deleteByIdContrat = async (req, res) => {
     }
 }
 
-module.exports = {postContrat, getContrat, getByIdContrat, updateByIdContrat, deleteByIdContrat}
+module.exports = {postContrat, getContrat, getContratByName, getByIdContrat, updateByIdContrat, deleteByIdContrat}
